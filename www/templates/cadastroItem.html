@@ -1,0 +1,23 @@
+<ion-view view-title="{{titulo}}">
+    <ion-content overflow-scroll="false" padding="true">
+        <form class="list" name="formItem" ng-submit="salvar()" novalidate>
+            <label class="item item-input item-stacked-label">
+                <span class="input-label">Descrição</span>
+                <input name="descricao" type="text" placeholder="Ex: Feijão" ng-model="item.descricao" required>
+            </label>
+            <label class="item item-select">
+                <span class="input-label">Unidade Medida</span>
+                <select name="unidadeMedida" ng-model="item.unidade_medida" ng-options="unidadeMedida.descricao as unidadeMedida.descricao for unidadeMedida in unidadesMedida" required></select>
+            </label>
+            <label class="item item-select">
+                <span class="input-label">Unidade Apresentação</span>
+                <select name="unidadeApresentacao" ng-model="item.unidade_apresentacao" ng-options="unidadeApresentacao.simbolo as unidadeApresentacao.descricao for unidadeApresentacao in unidadesApresentacao" required></select>
+            </label>
+            <label class="item item-input">
+                <span class="input-label">Quantidade</span>
+                <input name="descricao" type="number" ng-model="item.qt_unidade_apresentacao" required>
+            </label>
+            <button class="button button-block button-balanced" type="submit" ng-disabled="!formItem.$valid">Salvar</button>
+        </form>
+    </ion-content>
+</ion-view>

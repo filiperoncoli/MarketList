@@ -1,0 +1,60 @@
+.img-background {
+    background: url(../img/mercado.jpg) no-repeat center;
+    background-size: cover;
+}
+
+.btn-float {
+    border: 1px;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    position: fixed;
+    z-index: 999999;
+    text-align: center;
+    padding: 2px 0 0 1px;
+    top: 78%;
+    left: 80%;
+    -webkit-box-shadow: 2px 3px 2px 0.5px rgba(0,0,0,0.3);
+}
+
+.item-padding {
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.list-letters {
+    color: gray;
+    font-size: 20px;
+}
+
+.centralize {
+    margin: auto;
+    width: 80%;
+}
+
+.popup-confirm .popup-head {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background: #33cd5f;
+}
+
+.popup-confirm .popup-title {
+    color: #fff;
+    font-size: 20px;
+}
+
+.popup-confirm .popup-body {
+    color: gray;
+    font-size: 20px;
+    text-align: center;
+}
+
+.list-item {
+    border: none; 
+    padding-top: 0; 
+    padding-bottom: 0;
+}
+
+.tachado {
+    text-decoration: line-through;
+}

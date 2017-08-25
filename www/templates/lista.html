@@ -1,0 +1,37 @@
+<ion-view view-title="Lista de Compras">
+	<ion-nav-buttons side="right" ng-show="listaAtual.length">
+        <button class="button button-icon button-clear ion-more" menu-toggle="right" ng-click="mostrarOpcoes()"></button>
+    </ion-nav-buttons>
+	<ion-content overflow-scroll="false">
+		<span ng-show="!listaAtual.length">
+			<div class="list card">
+				<div class="item item-image">
+					<img src="img/lista.jpg">
+				</div>
+			</div>
+			<div class="spacer" style="height: 10px;"></div>
+			<div class="text-center centralize">
+				<span class="list-letters">Faça sua lista de compras adicionando os itens que você precisa</span>
+				<div class="spacer" style="height: 20px;"></div>
+				<button class="button icon-left ion-android-create button-balanced" ui-sref="tab.novalista">
+					Nova Lista
+				</button>
+			</div>
+		</span>
+		<span ng-show="listaAtual.length">
+			<ion-list>
+				<div class="row item" ng-repeat="item in listaAtual">
+					<div class="col col-80">
+						<ion-checkbox class="checkbox-balanced list-item" ng-model="check" ng-change="confirmarCompra(check, item)">
+							<span style="padding-top: 4px; font-size: 18px;" ng-class="{tachado: check}">{{item.descricao + ' (' + item.unidade_medida + ' - ' + item.qt_unidade_apresentacao + item.unidade_apresentacao + ')'}}</span>
+							<p style="font-size: 20px;">{{item.quantidade + ' unidades'}}</p>
+						</ion-checkbox>
+					</div>
+					<div class="col">
+						<a class="button assertive button-icon icon ion-android-delete" ng-click="excluirItem(item.id_item, item.id_lista)" style="left: 40%;"></a>
+					</div>
+				</div>
+			</ion-list>
+		</span>
+	</ion-content>
+</ion-view>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+		<title></title>
+
+		<link rel="manifest" href="manifest.json">
+		<link href="lib/ionic/css/ionic.css" rel="stylesheet">
+		<link href="css/style.css" rel="stylesheet">
+
+		<script src="lib/ionic/js/ionic.bundle.js"></script>
+		<script src="lib/ngCordova/dist/ng-cordova.js"></script>
+
+		<script src="cordova.js"></script>
+
+		<!-- APP -->
+		<script src="js/app.js"></script>
+
+		<!-- CONFIGURAÇÕES -->
+		<script src="js/config/routes.js"></script>
+		<script src="js/config/config.js"></script>
+		<script src="js/config/sqliteConfig.js"></script>
+
+		<!-- CONTROLLERS -->
+		<script src="js/controllers/listaCtrl.js"></script>
+		<script src="js/controllers/itensCtrl.js"></script>
+		<script src="js/controllers/historicoCtrl.js"></script>
+		<script src="js/controllers/cadastroItemCtrl.js"></script>
+		<script src="js/controllers/novaListaCtrl.js"></script>
+
+		<!-- SERVICES -->
+		<script src="js/services/dbService.js"></script>
+	</head>
+	<body ng-app="app">
+		<ion-nav-bar class="bar-balanced">
+			<ion-nav-back-button></ion-nav-back-button>
+		</ion-nav-bar>
+		<ion-nav-view></ion-nav-view>
+	</body>
+</html>
