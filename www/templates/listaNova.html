@@ -5,8 +5,8 @@
     <ion-content overflow-scroll="false">
         <div class="list">
 			<div class="item item-button-right item-padding" ng-repeat="item in itens">
-				<h2>{{item.descricao}}</h2>
-				<p>{{item.unidade_medida + ' - ' + item.qt_unidade_apresentacao + item.unidade_apresentacao}}</p>
+				<span style="font-size: 20px;">{{item.descricao}}</span>
+				<p style="font-size: 16px;">{{item.unidade_medida + ' - ' + item.qt_unidade_apresentacao + item.unidade_apresentacao}}</p>
 				<button class="button button-clear button-balanced" ng-click="checkar(item, !item.check)" ng-show="!item.check">
 					<i class="icon ion-android-checkbox-outline-blank"></i>
                 </button>

@@ -7,7 +7,8 @@ angular.module('cadastroItemModule', ['dbModule'])
         {id: 2, descricao: 'Caixa'},
         {id: 3, descricao: 'Frasco'},
         {id: 4, descricao: 'Tubo'},
-        {id: 5, descricao: 'Garrafa'}
+        {id: 5, descricao: 'Garrafa'},
+        {id: 6, descricao: 'Lata'}
     ];
     $scope.unidadesApresentacao = [
         {id: 1, descricao: 'Quilogramas', simbolo: 'kg'},

@@ -1,9 +1,9 @@
 angular.module('listaModule', ['dbModule'])
 
-.controller('listaCtrl', function($scope, $rootScope, db, $ionicPopup, $cordovaToast, $ionicActionSheet) {
+.controller('listaCtrl', function($scope, $rootScope, db, $ionicPopup, $cordovaToast) {
 
-    $scope.confirmarCompra = function(check, item) {
-        if (check) {
+    $scope.confirmarCompra = function(item) {
+        if (item.check) {
             $scope.preco = {};
 
             $ionicPopup.show({
@@ -16,7 +16,7 @@ angular.module('listaModule', ['dbModule'])
                         text: 'Cancelar',
                         type: 'button-outline button-balanced',
                         onTap: function(e) {
-                            check = false;
+                            item.check = false;
                         }
                     },
                     {
@@ -26,6 +26,10 @@ angular.module('listaModule', ['dbModule'])
                             item.preco_unitario = $scope.preco.valor;
                             item.in_checado = 'S';
 
+                            $rootScope.totalConta = !angular.isDefined($rootScope.totalConta) ? 0 : $rootScope.totalConta;
+
+                            $rootScope.totalConta += (item.preco_unitario * item.quantidade);
+
                             if (item.preco_unitario <= 0 || !angular.isDefined(item.preco_unitario)) {
                                 e.preventDefault();
                             }
@@ -34,6 +38,7 @@ angular.module('listaModule', ['dbModule'])
                 ]
             });
         } else {
+            $rootScope.totalConta -= (item.preco_unitario * item.quantidade);
             item.preco_unitario = null;
             item.in_checado = 'N';
         }
@@ -68,31 +73,56 @@ angular.module('listaModule', ['dbModule'])
         });
     }
 
-    $scope.mostrarOpcoes = function() {
-        $ionicActionSheet.show({
-            buttons: [
-                {text: '<i class="icon ion-android-done balanced"></i>Finalizar Compra'},
-                {text: '<i class="icon ion-social-usd positive"></i>Conta Atual'},
-                {text: '<i class="icon ion-android-close assertive"></i>Excluir Lista'}
-            ],
-            buttonClicked: function(index) {
-                console.log(index);
-                switch (index) {
-                    case 0:
+    $scope.finalizarLista = function() {
+        $ionicPopup.confirm({
+            title: 'Atenção',
+            cssClass: 'popup-confirm',
+            template: 'Deseja finalizar sua lista?',
+            cancelText: 'Cancelar',
+            cancelType: 'button-outline button-balanced',
+            okText: 'OK',
+            okType: 'button-outline button-balanced'
+        })
+        .then(function(res) {
+            if (res) {
+                var dataAtual = new Date();
+                var dataFormatada = dataAtual.getFullYear() + '-' + (dataAtual.getMonth() + 1) + '-' + dataAtual.getDate();
 
-                        break;
-                    case 1:
-                        
-                        break;
+                db.updateListaItem($rootScope.listaAtual)
+                .then(function(res) {
+                    db.updateLista({id: $rootScope.listaAtual[0].id_lista, in_finalizada: 'S', dt_compra: dataFormatada})
+                    .then(function(res) {
+                        $cordovaToast.show('Lista finalizada com sucesso', 'short', 'center');
+                        $rootScope.listaAtual = [];
+                    }, function(err) {
+                        $cordovaToast.show(err, 'short', 'center');
+                    });
+                }, function(err) {
+                    $cordovaToast.show(err, 'short', 'center');
+                });
+            }
+        });
+    }
 
-                    case 2:
-
-                        break;
-
-                    default:
-                        break;
-                }
-                return true;
+    $scope.excluirLista = function() {
+        $ionicPopup.confirm({
+            title: 'Atenção',
+            cssClass: 'popup-confirm',
+            template: 'Deseja excluir a lista?',
+            cancelText: 'Cancelar',
+            cancelType: 'button-outline button-balanced',
+            okText: 'OK',
+            okType: 'button-outline button-balanced'
+        })
+        .then(function(res) {
+            if (res) {
+                db.deleteLista($rootScope.listaAtual[0].id_lista)
+                .then(function(res) {
+                    $cordovaToast.show(res, 'short', 'center');
+                    $rootScope.listaAtual = [];
+                }, function(err) {
+                    $cordovaToast.show(err, 'short', 'center');
+                });
             }
         });
     }

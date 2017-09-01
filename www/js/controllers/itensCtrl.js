@@ -11,6 +11,25 @@ angular.module('itensModule', ['dbModule'])
         $cordovaToast.show(err, 'short', 'center');
     });
 
+    $scope.definirImagem = function(unidadeMedida) {
+        switch (unidadeMedida) {
+            case 'Pacote':
+                return 'img/pacote.png';
+            case 'Garrafa':
+                return 'img/garrafa.png';
+            case 'Tubo':
+                return 'img/tubo.png';
+            case 'Caixa':
+                return 'img/caixa.png';
+            case 'Frasco':
+                return 'img/frasco.png';
+            case 'Lata':
+                return 'img/lata.png';
+            default:
+                return '';
+        }
+    }
+
     $scope.excluirItem = function(idItem) {
         $ionicPopup.confirm({
             title: 'Atenção',

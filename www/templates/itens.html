@@ -1,14 +1,21 @@
 <ion-view view-title="Itens Cadastrados">
-	<div class="btn-float button button-balanced" ui-sref="tab.cadastroitem({inCadastro: true})">
-		<button class="button button-icon button-clear icon ion-android-add button-light"></button>
-	</div>
-	<ion-content class="img-background" overflow-scroll="false">
+	<ion-nav-buttons side="right">
+		<button class="button button-icon button-clear ion-android-add" ui-sref="tab.cadastroitem({inCadastro: true})"></button>
+    </ion-nav-buttons>
+	<ion-content overflow-scroll="false">
 		<ion-list>
 			<ion-item ng-repeat="item in itens">
-				<h2>{{item.descricao}}</h2>
-				<p>{{item.unidade_medida + ' - ' + item.qt_unidade_apresentacao + item.unidade_apresentacao}}</p>
-				<ion-option-button class="button-positive icon ion-android-create" ui-sref="tab.cadastroitem({inCadastro: false, item: item})"></ion-option-button>
-				<ion-option-button class="button-assertive icon ion-android-delete" ng-click="excluirItem(item.id)"></ion-option-button>
+				<div class="row">
+					<div class="col col-20">
+						<img class="item-img" ng-src="{{definirImagem(item.unidade_medida)}}">
+					</div>
+					<div class="col col-80">
+						<span style="font-size: 20px;">{{item.descricao}}</span>
+						<p style="font-size: 16px;">{{item.unidade_medida + ' - ' + item.qt_unidade_apresentacao + item.unidade_apresentacao}}</p>
+					</div>
+					<ion-option-button class="button-positive icon ion-android-create" ui-sref="tab.cadastroitem({inCadastro: false, item: item})"></ion-option-button>
+					<ion-option-button class="button-assertive icon ion-android-delete" ng-click="excluirItem(item.id)"></ion-option-button>
+				</div>
 			</ion-item>
 		</ion-list>
 	</ion-content>

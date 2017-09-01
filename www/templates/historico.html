@@ -1,5 +1,10 @@
 <ion-view view-title="Histórico de Compras">
 	<ion-content overflow-scroll="false">
-		
+		<div class="list">
+			<div class="item" ng-repeat="lista in listas">
+				<h2>Data da compra: {{lista.dt_compra | date:'dd/MM/yyyy'}}</h2>
+				<p>Valor da compra: R{{lista.valor_total | currency}}</p>
+			</div>
+		</div>
 	</ion-content>
 </ion-view>

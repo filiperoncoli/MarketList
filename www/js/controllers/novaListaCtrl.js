@@ -1,6 +1,6 @@
 angular.module('novaListaModule', ['dbModule'])
 
-.controller('novaListaCtrl', function($scope, $cordovaToast, db) {
+.controller('novaListaCtrl', function($scope, $rootScope, $state, $cordovaToast, db) {
 
     $scope.itens = [];
 
@@ -15,7 +15,7 @@ angular.module('novaListaModule', ['dbModule'])
         item.check = checkado;
     }
 
-    verificaItensSelecionados = function() {
+    verificarItensSelecionados = function() {
         var itensSelecionados = [];
 
         for (item of $scope.itens) {
@@ -28,11 +28,18 @@ angular.module('novaListaModule', ['dbModule'])
     }
 
     $scope.salvarLista = function() {
-        var itensSelecionados = verificaItensSelecionados();
+        var itensSelecionados = verificarItensSelecionados();
 
         db.insertLista(itensSelecionados)
         .then(function(res) {
-            $cordovaToast.show(res, 'short', 'center');
+            db.selectListaAtual()
+            .then(function(data) {
+                $rootScope.listaAtual = data;
+                $cordovaToast.show(res, 'short', 'center');
+                $state.go('tab.lista');
+            }, function(err) {
+                $cordovaToast.show(err, 'short', 'center');
+            });
         }, function(err) {
             $cordovaToast.show(err, 'short', 'center');
         });

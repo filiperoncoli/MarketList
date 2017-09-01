@@ -8,14 +8,28 @@ angular.module('dbModule', [])
         var values = [item.descricao, item.unidade_medida, item.unidade_apresentacao, item.qt_unidade_apresentacao];
 
         $cordovaSQLite.execute($rootScope.db, query, values)
-        .then(function (res) {
+        .then(function(res) {
             deferred.resolve('Item salvo com sucesso');
-        }, function (err) {
+        }, function(err) {
             console.log(err);
             deferred.reject('Erro ao salvar item');
         });
 
         return deferred.promise;
+    }
+
+    tratarResponse = function(res) {
+        if (res.rows.length > 0) {
+            var retorno = [];
+
+            for (var index = 0; index < res.rows.length; index++) {
+                retorno.push(res.rows.item(index));
+            };
+
+            return retorno;
+        } else {
+            return [];
+        }
     }
 
     this.selectItens = function() {
@@ -24,17 +38,7 @@ angular.module('dbModule', [])
 
         $cordovaSQLite.execute($rootScope.db, query, [])
         .then(function(res) {
-            if (res.rows.length > 0) {
-                var retorno = [];
-
-                for (var index = 0; index < res.rows.length; index++) {
-                    retorno.push(res.rows.item(index));
-                };
-
-                deferred.resolve(retorno);
-            } else {
-                deferred.resolve([]);
-            }
+            deferred.resolve(tratarResponse(res));
         }, function(err) {
             console.log(err);
             deferred.reject('Erro ao buscar itens');
@@ -49,9 +53,9 @@ angular.module('dbModule', [])
         var values = [idItem];
 
         $cordovaSQLite.execute($rootScope.db, query, values)
-        .then(function (res) {
+        .then(function(res) {
             deferred.resolve('Item excluído com sucesso');
-        }, function (err) {
+        }, function(err) {
             console.log(err);
             deferred.reject('Erro ao excluir item');
         });
@@ -65,9 +69,9 @@ angular.module('dbModule', [])
         var values = [item.descricao, item.unidade_medida, item.unidade_apresentacao, item.qt_unidade_apresentacao, item.id];
 
         $cordovaSQLite.execute($rootScope.db, query, values)
-        .then(function (res) {
+        .then(function(res) {
             deferred.resolve('Item alterado com sucesso');
-        }, function (err) {
+        }, function(err) {
             console.log(err);
             deferred.reject('Erro ao alterar item');
         });
@@ -158,17 +162,7 @@ angular.module('dbModule', [])
 
         $cordovaSQLite.execute($rootScope.db, query, [])
         .then(function(res) {
-            if (res.rows.length > 0) {
-                var retorno = [];
-
-                for (var index = 0; index < res.rows.length; index++) {
-                    retorno.push(res.rows.item(index));
-                };
-
-                deferred.resolve(retorno);
-            } else {
-                deferred.resolve([]);
-            }
+            deferred.resolve(tratarResponse(res));
         }, function(err) {
             console.log(err);
             deferred.reject('Erro ao buscar lista');
@@ -183,11 +177,105 @@ angular.module('dbModule', [])
         var values = [idItem, idLista];
 
         $cordovaSQLite.execute($rootScope.db, query, values)
-        .then(function (res) {
+        .then(function(res) {
             deferred.resolve('Item excluído da lista com sucesso');
-        }, function (err) {
+        }, function(err) {
             console.log(err);
             deferred.reject('Erro ao excluir item');
+        });
+
+        return deferred.promise;
+    }
+
+    this.updateLista = function(lista) {
+        console.log(lista);
+
+        var deferred = $q.defer();
+        var query = "UPDATE lista SET dt_compra = ?, in_finalizada = ? WHERE id = ?";
+        var values = [lista.dt_compra, lista.in_finalizada, lista.id];
+
+        $cordovaSQLite.execute($rootScope.db, query, values)
+        .then(function(res) {
+            deferred.resolve('Lista atualizada com sucesso');
+        }, function(err) {
+            console.log(err);
+            deferred.reject('Erro ao atualizar lista');
+        });
+
+        return deferred.promise;
+    }
+
+    deleteListaCascade = function(idLista) {
+        var deferred = $q.defer();
+        var query = "DELETE FROM lista WHERE id = ?";
+        var values = [idLista];
+
+        $cordovaSQLite.execute($rootScope.db, query, values)
+        .then(function(res) {
+            deferred.resolve(res);
+        }, function(err) {
+            console.log(err);
+            deferred.reject('Erro ao excluir lista');
+        });
+
+        return deferred.promise;
+    }
+
+    this.deleteLista = function(idLista) {
+        var deferred = $q.defer();
+        var query = "DELETE FROM lista_item WHERE id_lista = ?";
+        var values = [idLista];
+
+        $cordovaSQLite.execute($rootScope.db, query, values)
+        .then(function(res) {
+            deleteListaCascade(idLista)
+            .then(function(res) {
+                deferred.resolve('Lista excluída com sucesso');
+            }, function(err) {
+                console.log(err);
+                deferred.reject('Erro ao excluir lista');
+            });
+        }, function(err) {
+            console.log(err);
+            deferred.reject('Erro ao excluir lista');
+        });
+
+        return deferred.promise;
+    }
+
+    this.updateListaItem = function(listaItens) {
+        var deferred = $q.defer();
+        var query = "";
+
+        for (item of listaItens) {
+            query += "UPDATE lista_item SET in_checado = '" + item.in_checado + "', " + 
+                     "quantidade = " + item.quantidade + ", " + "preco_unitario = " + item.preco_unitario +
+                     " WHERE id_item = " + item.id_item + " AND id_lista = " + item.id_lista + ";";
+        }
+
+        $cordovaSQLite.execute($rootScope.db, query, [])
+        .then(function(res) {
+            deferred.resolve('Itens atualizados com sucesso');
+        }, function(err) {
+            console.log(err);
+            deferred.reject('Erro ao atualizar itens');
+        });
+
+        return deferred.promise;
+    }
+
+    this.selectListasFinalizadas = function() {
+        var deferred = $q.defer();
+        var query = "SELECT id_lista, SUM(li.preco_unitario * li.quantidade) AS valor_total, dt_compra " +
+                    "FROM lista_item li INNER JOIN lista l ON li.id_lista = l.id WHERE in_finalizada = 'S' " +
+                    "GROUP BY id_lista, dt_compra";
+
+        $cordovaSQLite.execute($rootScope.db, query, [])
+        .then(function(res) {
+            deferred.resolve(tratarResponse(res));
+        }, function(err) {
+            console.log(err);
+            deferred.reject('Erro ao buscar histórico de listas');
         });
 
         return deferred.promise;
