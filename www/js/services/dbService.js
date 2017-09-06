@@ -188,15 +188,13 @@ angular.module('dbModule', [])
     }
 
     this.updateLista = function(lista) {
-        console.log(lista);
-
         var deferred = $q.defer();
         var query = "UPDATE lista SET dt_compra = ?, in_finalizada = ? WHERE id = ?";
         var values = [lista.dt_compra, lista.in_finalizada, lista.id];
 
         $cordovaSQLite.execute($rootScope.db, query, values)
         .then(function(res) {
-            deferred.resolve('Lista atualizada com sucesso');
+            deferred.resolve();
         }, function(err) {
             console.log(err);
             deferred.reject('Erro ao atualizar lista');
@@ -243,19 +241,21 @@ angular.module('dbModule', [])
         return deferred.promise;
     }
 
-    this.updateListaItem = function(listaItens) {
+    this.updateListaItem = function(listaItem) {
         var deferred = $q.defer();
-        var query = "";
+        var query = "UPDATE lista_item SET in_checado = ?, quantidade = ?, preco_unitario = ? " +
+                    "WHERE id_item = ? AND id_lista = ?";
+        var values = [listaItem.in_checado, listaItem.quantidade, listaItem.preco_unitario, listaItem.id_item, listaItem.id_lista];
 
-        for (item of listaItens) {
+        /*for (item of listaItens) {
             query += "UPDATE lista_item SET in_checado = '" + item.in_checado + "', " + 
                      "quantidade = " + item.quantidade + ", " + "preco_unitario = " + item.preco_unitario +
                      " WHERE id_item = " + item.id_item + " AND id_lista = " + item.id_lista + ";";
-        }
+        }*/
 
-        $cordovaSQLite.execute($rootScope.db, query, [])
+        $cordovaSQLite.execute($rootScope.db, query, values)
         .then(function(res) {
-            deferred.resolve('Itens atualizados com sucesso');
+            deferred.resolve();
         }, function(err) {
             console.log(err);
             deferred.reject('Erro ao atualizar itens');
@@ -268,7 +268,7 @@ angular.module('dbModule', [])
         var deferred = $q.defer();
         var query = "SELECT id_lista, SUM(li.preco_unitario * li.quantidade) AS valor_total, dt_compra " +
                     "FROM lista_item li INNER JOIN lista l ON li.id_lista = l.id WHERE in_finalizada = 'S' " +
-                    "GROUP BY id_lista, dt_compra";
+                    "GROUP BY id_lista, dt_compra ORDER BY id_lista ASC";
 
         $cordovaSQLite.execute($rootScope.db, query, [])
         .then(function(res) {

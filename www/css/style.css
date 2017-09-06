@@ -62,6 +62,11 @@
     text-align: center;
 }
 
+.popup-confirm .popup-body .popup-label {
+    font-size: 20px;
+    text-align: left;
+}
+
 .list-item {
     border: none; 
     padding-top: 0; 
@@ -85,4 +90,15 @@
 
 .item-complex .item-content {
     padding: 0;
+}
+
+.item-historico {
+    opacity: 0.7
+}
+
+.font-historico {
+    font-weight: bold;
+    font-size: 24px;
+    color: black;
+    width: 100%;
 }

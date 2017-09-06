@@ -6,6 +6,8 @@ angular.module('sqliteModule', ['ionic', 'ngCordova', 'dbModule'])
 
         $rootScope.db = $cordovaSQLite.openDB({name: "market_list.db", iosDatabaseLocation: 'default'});
 
+        //$cordovaSQLite.execute($rootScope.db, 'DELETE FROM lista');
+
         $cordovaSQLite.execute($rootScope.db, "CREATE TABLE IF NOT EXISTS item (" +
                                                 "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                                                 "descricao TEXT NOT NULL, " +

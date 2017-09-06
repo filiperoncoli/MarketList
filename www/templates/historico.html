@@ -1,9 +1,9 @@
 <ion-view view-title="Histórico de Compras">
-	<ion-content overflow-scroll="false">
+	<ion-content overflow-scroll="false" class="img-background">
 		<div class="list">
-			<div class="item" ng-repeat="lista in listas">
-				<h2>Data da compra: {{lista.dt_compra | date:'dd/MM/yyyy'}}</h2>
-				<p>Valor da compra: R{{lista.valor_total | currency}}</p>
+			<div class="item item-historico" ng-repeat="lista in listas">
+				<span class="font-historico">Data da compra: {{lista.dt_compra}}</span>
+				<p ng-style="{'font-size':'20px', 'color':'black', 'font-weight':'bold'}">Valor da compra: R{{lista.valor_total | currency}}</p>
 			</div>
 		</div>
 	</ion-content>

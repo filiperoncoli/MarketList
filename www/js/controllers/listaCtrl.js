@@ -4,11 +4,21 @@ angular.module('listaModule', ['dbModule'])
 
     $scope.confirmarCompra = function(item) {
         if (item.check) {
-            $scope.preco = {};
+            $scope.form = {
+                quantidade: item.quantidade,
+                descricaoItem: item.descricao
+            };
 
             $ionicPopup.show({
-                template: '<label class="item item-input" name="preco"><input type="number" step=0.01 ng-model="preco.valor"></label>',
-                title: 'Preço do Item',
+                template: '<label class="item item-input">' +
+                            '<span class="input-label popup-label">Preço:</span>' +
+                            '<input type="number" step=0.01 ng-model="form.preco">' + 
+                          '</label>' +
+                          '<label class="item item-input">' +
+                            '<span class="input-label popup-label">Quantidade:</span>' +
+                            '<input type="number" ng-model="form.quantidade">' + 
+                          '</label>',
+                title: item.descricao,
                 cssClass: 'popup-confirm',
                 scope: $scope,
                 buttons: [
@@ -23,15 +33,22 @@ angular.module('listaModule', ['dbModule'])
                         text: 'OK',
                         type: 'button-outline button-balanced',
                         onTap: function(e) {
-                            item.preco_unitario = $scope.preco.valor;
+                            item.preco_unitario = $scope.form.preco;
+                            item.quantidade = $scope.form.quantidade;
                             item.in_checado = 'S';
 
                             $rootScope.totalConta = !angular.isDefined($rootScope.totalConta) ? 0 : $rootScope.totalConta;
-
                             $rootScope.totalConta += (item.preco_unitario * item.quantidade);
 
-                            if (item.preco_unitario <= 0 || !angular.isDefined(item.preco_unitario)) {
+                            if (item.preco_unitario <= 0 || !angular.isDefined(item.preco_unitario) || item.quantidade <= 0 || !angular.isDefined(item.quantidade)) {
                                 e.preventDefault();
+                            } else {
+                                db.updateListaItem(item)
+                                .then(function(res) {
+
+                                }, function(err) {
+                                    $cordovaToast.show(err, 'short', 'center');
+                                });
                             }
                         }
                     }
@@ -86,7 +103,7 @@ angular.module('listaModule', ['dbModule'])
         .then(function(res) {
             if (res) {
                 var dataAtual = new Date();
-                var dataFormatada = dataAtual.getFullYear() + '-' + (dataAtual.getMonth() + 1) + '-' + dataAtual.getDate();
+                var dataFormatada = dataAtual.getDate() + '/' + (dataAtual.getMonth() + 1) + '/' + dataAtual.getFullYear();
 
                 db.updateListaItem($rootScope.listaAtual)
                 .then(function(res) {
