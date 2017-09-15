@@ -14,13 +14,14 @@
 			<div class="text-center centralize">
 				<span class="list-letters">Faça sua lista de compras adicionando os itens que você precisa</span>
 				<div class="spacer" style="height: 20px;"></div>
-				<button class="button icon-left ion-android-create button-balanced" ui-sref="tab.novalista">
+				<button class="button icon-left ion-android-create button-balanced" ui-sref="tab.adicionaritens({novaLista: true})">
 					Nova Lista
 				</button>
 			</div>
 		</span>
 		<span ng-show="listaAtual.length">
 			<div class="img-top">
+				<button class="button button-small icon-right ion-android-add button-balanced btn-add" ui-sref="tab.adicionaritens({novaLista: false})">Adicionar </button>
 				<div class="content" ng-show="totalConta > 0">
 					<span>Total: R{{totalConta | currency}}</span>
 				</div>
@@ -29,14 +30,14 @@
 				<div class="row item" ng-repeat="item in listaAtual">
 					<div class="col col-80">
 						<ion-checkbox class="checkbox-balanced list-item" ng-model="item.check" ng-checked="item.in_checado === 'S'" ng-change="confirmarCompra(item)">
-							<span style="padding-top: 4px; font-size: 18px;" ng-class="{tachado: item.check}">{{item.descricao}}</span>
-							<p style="font-size: 12px; color: black;" ng-class="{tachado: item.check}">{{'(' + item.unidade_medida + ' - ' + item.qt_unidade_apresentacao + item.unidade_apresentacao + ')'}}</p>
-							<p style="font-size: 20px;" ng-class="{tachado: item.check}">{{item.quantidade + ' unidades'}}</p>
+							<span style="padding-top: 4px; font-size: 18px;" ng-class="{tachado: item.in_checado === 'S'}">{{item.descricao}}</span>
+							<p style="font-size: 12px; color: black;" ng-class="{tachado: item.in_checado === 'S'}">{{'(' + item.unidade_medida + ' - ' + item.qt_unidade_apresentacao + item.unidade_apresentacao + ')'}}</p>
+							<p style="font-size: 20px;" ng-class="{tachado: item.in_checado === 'S'}">{{item.quantidade + ' unidades'}}</p>
 						</ion-checkbox>
 					</div>
 					<span class="badge badge-balanced preco-badge" ng-show="item.preco_unitario">R{{item.preco_unitario | currency}}</span>
 					<div class="col">
-						<a class="button assertive button-icon icon ion-android-delete" ng-show="!item.check" ng-click="excluirItem(item.id_item, item.id_lista)" style="left: 40%;"></a>
+						<a class="button assertive button-icon icon ion-android-delete" ng-show="item.in_checado === 'N'" ng-click="excluirItem(item.id_item, item.id_lista)" style="left: 40%;"></a>
 					</div>
 				</div>
 			</div>

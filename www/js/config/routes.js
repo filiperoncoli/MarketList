@@ -11,8 +11,10 @@ angular.module('routes', [])
     })
 
     .state('tab.lista', {
-        cache: false,
         url: '/lista',
+        params: {
+            atualizarLista: false
+        },
         views: {
             'tab-lista': {
                 templateUrl: 'templates/lista.html',
@@ -56,12 +58,16 @@ angular.module('routes', [])
         }
     })
     
-    .state('tab.novalista', {
-        url: '/novalista',
+    .state('tab.adicionaritens', {
+        url: '/adicionaritens',
+        cache: false,
+        params: {
+            novaLista: true
+        },
         views: {
             'tab-lista': {
-                templateUrl: 'templates/listaNova.html',
-                controller: 'novaListaCtrl'
+                templateUrl: 'templates/adicionarItens.html',
+                controller: 'adicionarItensCtrl'
             }
         }
     });

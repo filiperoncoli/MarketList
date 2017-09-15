@@ -52,7 +52,8 @@ angular.module('sqliteModule', ['ionic', 'ngCordova', 'dbModule'])
         //de ser aberta a transação no banco de dados
         db.selectListaAtual()
         .then(function(data) {
-            $rootScope.listaAtual = data;
+            $rootScope.listaAtual = data.itensLista;
+            $rootScope.totalConta = data.totalConta;
         }, function(err) {
             console.log(err);
         });

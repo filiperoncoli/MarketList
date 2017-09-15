@@ -1,6 +1,16 @@
 angular.module('listaModule', ['dbModule'])
 
-.controller('listaCtrl', function($scope, $rootScope, db, $ionicPopup, $cordovaToast) {
+.controller('listaCtrl', function($scope, $rootScope, $stateParams, db, $ionicPopup, $cordovaToast) {
+
+    if ($stateParams.atualizarLista) {
+        db.selectListaAtual()
+        .then(function(data) {
+            $rootScope.listaAtual = data.itensLista;
+            $rootScope.totalConta = data.totalConta;
+        }, function(err) {
+            $cordovaToast.show('Erro ao atualizar lista', 'short', 'center');
+        });
+    }
 
     $scope.confirmarCompra = function(item) {
         if (item.check) {
@@ -12,11 +22,11 @@ angular.module('listaModule', ['dbModule'])
             $ionicPopup.show({
                 template: '<label class="item item-input">' +
                             '<span class="input-label popup-label">Preço:</span>' +
-                            '<input type="number" step=0.01 ng-model="form.preco">' + 
+                            '<input type="number" step=0.01 ng-model="form.preco" class="popup-label">' + 
                           '</label>' +
                           '<label class="item item-input">' +
                             '<span class="input-label popup-label">Quantidade:</span>' +
-                            '<input type="number" ng-model="form.quantidade">' + 
+                            '<input type="number" ng-model="form.quantidade" class="popup-label">' + 
                           '</label>',
                 title: item.descricao,
                 cssClass: 'popup-confirm',
@@ -58,6 +68,13 @@ angular.module('listaModule', ['dbModule'])
             $rootScope.totalConta -= (item.preco_unitario * item.quantidade);
             item.preco_unitario = null;
             item.in_checado = 'N';
+
+            db.updateListaItem(item)
+            .then(function(res) {
+
+            }, function(err) {
+                $cordovaToast.show(err, 'short', 'center');
+            });
         }
     }
 
@@ -102,12 +119,11 @@ angular.module('listaModule', ['dbModule'])
         })
         .then(function(res) {
             if (res) {
-                var dataAtual = new Date();
-                var dataFormatada = dataAtual.getDate() + '/' + (dataAtual.getMonth() + 1) + '/' + dataAtual.getFullYear();
+                var dataAtual = new Date().getTime();
 
                 db.updateListaItem($rootScope.listaAtual)
                 .then(function(res) {
-                    db.updateLista({id: $rootScope.listaAtual[0].id_lista, in_finalizada: 'S', dt_compra: dataFormatada})
+                    db.updateLista({id: $rootScope.listaAtual[0].id_lista, in_finalizada: 'S', dt_compra: dataAtual})
                     .then(function(res) {
                         $cordovaToast.show('Lista finalizada com sucesso', 'short', 'center');
                         $rootScope.listaAtual = [];

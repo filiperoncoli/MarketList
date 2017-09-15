@@ -1,16 +1,16 @@
-<ion-view view-title="Nova Lista">
+<ion-view view-title="{{titulo}}">
     <ion-nav-buttons side="right">
-        <button class="button button-clear" ng-click="salvarLista()">Salvar</button>
+        <button class="button button-clear" ng-click="salvarLista()" ng-show="contItens > 0">Salvar</button>
     </ion-nav-buttons>
     <ion-content overflow-scroll="false">
         <div class="list">
 			<div class="item item-button-right item-padding" ng-repeat="item in itens">
 				<span style="font-size: 20px;">{{item.descricao}}</span>
 				<p style="font-size: 16px;">{{item.unidade_medida + ' - ' + item.qt_unidade_apresentacao + item.unidade_apresentacao}}</p>
-				<button class="button button-clear button-balanced" ng-click="checkar(item, !item.check)" ng-show="!item.check">
+				<button class="button button-clear button-balanced" ng-click="selecionarItem(item, !item.check)" ng-show="!item.check">
 					<i class="icon ion-android-checkbox-outline-blank"></i>
                 </button>
-                <button class="button button-clear button-balanced" ng-click="checkar(item, !item.check)" ng-show="item.check">
+                <button class="button button-clear button-balanced" ng-click="selecionarItem(item, !item.check)" ng-show="item.check">
 					<i class="icon ion-android-checkbox"></i>
                 </button>
                 <label class="item-input" ng-show="item.check">

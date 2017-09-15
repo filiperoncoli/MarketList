@@ -7,7 +7,7 @@ angular.module('app', [
 	'itensModule',
 	'historicoModule',
 	'cadastroItemModule',
-	'novaListaModule'
+	'adicionarItensModule'
 ])
 
 .run(function($ionicPlatform) {

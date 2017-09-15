@@ -32,11 +32,20 @@ angular.module('dbModule', [])
         }
     }
 
-    this.selectItens = function() {
+    this.selectItens = function(idLista) {
         var deferred = $q.defer();
-        var query = "SELECT id, descricao, unidade_medida, unidade_apresentacao, qt_unidade_apresentacao FROM item";
+        var query = "";
+        var values = [];
 
-        $cordovaSQLite.execute($rootScope.db, query, [])
+        if (idLista) {
+            query = "SELECT id, descricao, unidade_medida, unidade_apresentacao, qt_unidade_apresentacao FROM item " +
+                    "WHERE id NOT IN (SELECT id_item FROM lista_item WHERE id_lista = ?)";
+            values = [idLista];
+        } else {
+            query = "SELECT id, descricao, unidade_medida, unidade_apresentacao, qt_unidade_apresentacao FROM item";
+        }
+
+        $cordovaSQLite.execute($rootScope.db, query, values)
         .then(function(res) {
             deferred.resolve(tratarResponse(res));
         }, function(err) {
@@ -102,10 +111,40 @@ angular.module('dbModule', [])
         return deferred.promise;
     }
 
+    insertTabelaListaItem = function(itens, idLista) {
+        var deferred = $q.defer();
+        var query = "INSERT INTO lista_item (id_item, id_lista, in_checado, quantidade) VALUES ";
+        var values = [];
+        var cont = 1;
+
+        for (item of itens) {
+            if (cont === itens.length) {
+                query += "(?,?,?,?);";
+            } else {
+                query += "(?,?,?,?), ";
+            }
+            
+            values.push(item.id);
+            values.push(idLista);
+            values.push('N');
+            values.push(item.quantidade);
+            cont += 1;
+        }
+
+        $cordovaSQLite.execute($rootScope.db, query, values)
+        .then(function(res) {
+            deferred.resolve();
+        }, function(err) {
+            console.log(err);
+            deferred.reject();
+        });
+
+        return deferred.promise;
+    }
+
     this.insertLista = function(itens) {
         var deferred = $q.defer();
         var query = "INSERT INTO lista (in_finalizada) VALUES (?)";
-        var values = [];
 
         $cordovaSQLite.execute($rootScope.db, query, ['N'])
         .then(function(res) {
@@ -114,28 +153,10 @@ angular.module('dbModule', [])
                 var idLista = res;
 
                 if (idLista > 0) {
-                    query = "INSERT INTO lista_item (id_item, id_lista, in_checado, quantidade) VALUES ";
-                    var cont = 1;
-
-                    for (item of itens) {
-                        if (cont === itens.length) {
-                            query += "(?,?,?,?);";
-                        } else {
-                            query += "(?,?,?,?), ";
-                        }
-                        
-                        values.push(item.id);
-                        values.push(idLista);
-                        values.push('N');
-                        values.push(item.quantidade);
-                        cont += 1;
-                    }
-
-                    $cordovaSQLite.execute($rootScope.db, query, values)
-                    .then(function(res) {
+                    insertTabelaListaItem(itens, idLista)
+                    .then(function() {
                         deferred.resolve('Lista de compras salva com sucesso');
-                    }, function(err) {
-                        console.log(err);
+                    }, function() {
                         deferred.reject('Erro ao salvar lista de compras');
                     });
                 } else {
@@ -152,17 +173,43 @@ angular.module('dbModule', [])
         return deferred.promise;
     }
 
+    this.insertListaItem = function(itens, idLista) {
+        var deferred = $q.defer();
+
+        insertTabelaListaItem(itens, idLista)
+        .then(function() {
+            deferred.resolve('Lista de compras atualizada com sucesso');
+        }, function() {
+            deferred.reject('Erro ao atualizar lista de compras');
+        });
+
+        return deferred.promise;
+    }
+
     this.selectListaAtual = function() {
         var deferred = $q.defer();
         var query = "SELECT id_item, i.descricao, i.unidade_medida, i.unidade_apresentacao, " +
-                    "i.qt_unidade_apresentacao, id_lista, in_checado, quantidade " +
+                    "i.qt_unidade_apresentacao, id_lista, in_checado, quantidade, preco_unitario " +
                     "FROM lista_item li INNER JOIN lista l ON li.id_lista = l.id " +
                     "INNER JOIN item i ON li.id_item = i.id " +
                     "WHERE l.in_finalizada = 'N' AND id_lista = (SELECT MAX(id) FROM lista)";
 
         $cordovaSQLite.execute($rootScope.db, query, [])
         .then(function(res) {
-            deferred.resolve(tratarResponse(res));
+            var listaAtual = tratarResponse(res);
+            var totalConta = 0;
+
+            if (listaAtual.length) {
+                for (item of listaAtual) {
+                    item.in_checado === 'S' ? item.check = true : item.check = false;
+
+                    if (item.check && item.preco_unitario) {
+                        totalConta += (item.preco_unitario * item.quantidade);
+                    }
+                }
+            }
+
+            deferred.resolve({itensLista: listaAtual, totalConta: totalConta});
         }, function(err) {
             console.log(err);
             deferred.reject('Erro ao buscar lista');
@@ -247,12 +294,6 @@ angular.module('dbModule', [])
                     "WHERE id_item = ? AND id_lista = ?";
         var values = [listaItem.in_checado, listaItem.quantidade, listaItem.preco_unitario, listaItem.id_item, listaItem.id_lista];
 
-        /*for (item of listaItens) {
-            query += "UPDATE lista_item SET in_checado = '" + item.in_checado + "', " + 
-                     "quantidade = " + item.quantidade + ", " + "preco_unitario = " + item.preco_unitario +
-                     " WHERE id_item = " + item.id_item + " AND id_lista = " + item.id_lista + ";";
-        }*/
-
         $cordovaSQLite.execute($rootScope.db, query, values)
         .then(function(res) {
             deferred.resolve();
@@ -264,6 +305,12 @@ angular.module('dbModule', [])
         return deferred.promise;
     }
 
+    tratarDatas = function(listasFinalizadas) {
+        for (lista of listasFinalizadas) {
+            lista.dt_compra = new Date(lista.dt_compra);
+        }
+    }
+
     this.selectListasFinalizadas = function() {
         var deferred = $q.defer();
         var query = "SELECT id_lista, SUM(li.preco_unitario * li.quantidade) AS valor_total, dt_compra " +
@@ -272,7 +319,9 @@ angular.module('dbModule', [])
 
         $cordovaSQLite.execute($rootScope.db, query, [])
         .then(function(res) {
-            deferred.resolve(tratarResponse(res));
+            var listas = tratarResponse(res);
+            tratarDatas(listas);
+            deferred.resolve(listas);
         }, function(err) {
             console.log(err);
             deferred.reject('Erro ao buscar histórico de listas');
